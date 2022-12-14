@@ -1,3 +1,18 @@
+# 505_FinalProject
+## By: Anna Romero
+
+#This is testing item recognition memory.
+#Participants are shown 10 images in the beginning of the block.
+#Afterwards, they are tested on all the images plus 5 new images. They are to press 1 if they saw the image before ("old" condition) and they have to press 2 if was not presented earlier ("new" condition). Therefore, overall there are 15 images during testing.
+
+#The stimuli I am using are screenshots of the unity assets we are currently using in our VR videos. We want to test item recognition for objects we have created in our scenes and I wanted to see if we could do this through psychopy.
+
+#The images are to be presented for 1500 msecs or 1.5 seconds during the presentation stage. During testing, the image will stay up until "1" or "2" are pressed. 
+
+#In the csv file that is created at the end records the Trial (no block, because there is only 1 block), the accuracy, and response time of the participant.
+
+
+
 #=====================
 #IMPORT MODULES
 #=====================
@@ -7,6 +22,7 @@ import numpy as np
 from psychopy import core, gui, visual, event, monitors, logging
 #-import file save functions
 import json
+import pandas as pd
 #-(import other functions as necessary: os...)
 import os
 from datetime import datetime
@@ -22,6 +38,7 @@ data_dir = os.path.join(main_dir,'data')
 #-if you will be presenting images, define the image directory
 image_dir = os.path.join(main_dir,'images')
 print(image_dir)
+path = os.path.join(main_dir, 'dataFiles')
 
 
 #=====================
@@ -48,7 +65,7 @@ sub_dir = os.path.join(main_dir,'sub_info',filename)
 #-number of trials and blocks *
 nTrials = 15
 nPresent = 10
-nBlocks = 2
+nBlocks = 1
 totalTrials = nTrials*nBlocks
 nEach = int(totalTrials/2)
 
@@ -60,6 +77,7 @@ new = ['new1.png','new2.png', 'new3.png', 'new4.png', 'new5.png']
 test = ['old1.png', 'old2.png', 'old3.png', 'old4.png', 'old5.png',
          'old6.png', 'old7.png', 'old8.png', 'old9.png', 'old10.png',
          'new1.png','new2.png', 'new3.png', 'new4.png', 'new5.png']
+
 
 #-start message text *
 start_msg = "Welcome to the experiment, press any key to begin"
@@ -103,10 +121,7 @@ start_text = visual.TextStim(win, text = start_msg)
 #-define block (start)/end text using psychopy functions
 fixation = visual.TextStim(win, text='+', color='black')
 presentStart_text = visual.TextStim(win, text = presentStart_msg)
-presentEnd_text = visual.TextStim(win, text = presentEnd_msg)
 testStart_text = visual.TextStim(win, text = testStart_msg)
-testEnd1_text = visual.TextStim(win, text = testEnd1_msg)
-testEnd2_text = visual.TextStim(win, text = testEnd2_msg)
 instructText = visual.TextStim(win, text = 'Press any key to begin Block ')
 
 #-define stimuli using psychopy functions
@@ -115,7 +130,6 @@ my_image = visual.ImageStim(win, units = "pix", size = (400, 400))
 
 #-create response time clock
 trial_timer = core.Clock()
-stimTimer = core.CountdownTimer()
 
 #=====================
 #START EXPERIMENT
@@ -168,7 +182,7 @@ for iblock in range(nBlocks):
                 
         if keys:
             responseTimes[overallTrial] = trial_timer.getTime() 
-            if test[overallTrial] == 'o':
+            if test[overallTrial][0] == 'o':
                 if keys[0] == '1':
                     accuracies[overallTrial] = 'Correct'
                 else:
@@ -181,8 +195,6 @@ for iblock in range(nBlocks):
     
 #print out Block, Trial, Color, Accuracy (correct or incorrect), and RT of current trial
         print(
-        'Block:',
-         iblock+1,
          ', Trial:', 
          itrial+1, 
          ',', 
@@ -191,12 +203,12 @@ for iblock in range(nBlocks):
          accuracies[overallTrial], 
          ', RT:', 
          responseTimes[overallTrial],
-         ',', overallTrial
+         ',',
+         keys[0]
         )
 
 #create a data frame from a dictionary of collected data then make it to csv file)
 df = pd.DataFrame(data={
- "Block Number": blockNumbers, 
  "Trial Number": trialNumbers, 
  "Accuracy": accuracies, 
  "Response Time": responseTimes,
